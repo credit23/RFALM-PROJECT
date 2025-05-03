@@ -10,15 +10,6 @@
 typedef enum { IDLE, WORKING, ERROR } RobotStatus;
 
 typedef struct {
-    int id;
-    char name[50];
-    RobotStatus status;
-    int tasksCompleted;
-    time_t lastMaintenance;
-    
-} Robot;
-
-typedef struct {
     int taskId;
     char description[100];
     int componentIds[10]; 
