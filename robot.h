@@ -24,7 +24,7 @@ void editRobot(int id);
 void deleteRobot(int id);
 void printRobotDetails(const Robot *robot);
 void listAllRobots(void);
-void searchRobotsByStatus(RobotStatus status);
+void searchRobotsByStatus(void);
 void resetRobotStatus(int id);
 void showWorkHistory(const Robot *robot);
 Robot* viewRobotById(int id);

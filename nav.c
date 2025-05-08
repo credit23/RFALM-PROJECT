@@ -76,19 +76,9 @@ void managerobotssubmenu(void) {
             case 5:
                 listAllRobots();
                 break;
-            case 6: {
-                int status;
-                int found=0;
-                printf("Enter status (0-IDLE,1-WORKING,2-ERROR): ");
-                scanf("%d", &status);
-                for(int i=0;i<MAX_ROBOTS;i++){
-                    if(robots[i].status==status){
-                        searchRobotsByStatus(status);
-                        found=1;
-                    }
-                }if(!found) printf("Robot not found.");
+            case 6: searchRobotsByStatus();
                 break;
-            }
+            
             case 7: {
                 int id;
                 int found=0;

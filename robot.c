@@ -139,31 +139,37 @@ void listAllRobots(void) {
     for (int i = 0; i < robotCount; i++) printRobotDetails(&robots[i]);
 }
 
-void searchRobotsByStatus(RobotStatus status) {
+void searchRobotsByStatus(){
+    int status;
+    int found = 0;
+    printf("Enter status (0-IDLE,1-WORKING,2-ERROR): ");
+    scanf("%d", &status);
+    while (getchar() != '\n');
+    
     if (status < IDLE || status > ERROR) {
-        printf("\nInvalid status code!\n");
+        printf("Invalid status code!\n");
         return;
     }
-    printf("\n=== Robots in ");
-    if (status == IDLE) {
-        printf("IDLE");
-    } else if (status == WORKING) {
-        printf("WORKING");
-    } else {
-        printf("ERROR");
+    
+    printf("\n=== Robots with Status: ");
+    switch(status) {
+        case IDLE:    printf("IDLE"); break;
+        case WORKING: printf("WORKING"); break;
+        case ERROR:   printf("ERROR"); break;
     }
-    printf(" Status ===\n");
-
-    int found = 0;
-    for (int i = 0; i < robotCount; i++) {
-        if (robots[i].status == status) {
+    printf(" ===\n");
+    
+    for (int i = 0; i < MAX_ROBOTS; i++) {
+        if (robots[i].id != 0 && robots[i].status == status) {
             printRobotDetails(&robots[i]);
-            found++;
+            found = 1;
         }
     }
-    if (!found) printf("No robots found in that status!\n");
+    
+    if (!found) {
+        printf("No robots found with this status.\n");
+    }
 }
-
 void resetRobotStatus(int id) {
     Robot *r = viewRobotById(id);
     if (!r) {
