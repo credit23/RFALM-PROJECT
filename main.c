@@ -82,46 +82,48 @@ int main() {
 
 int saveSession(const char* filename) {
     FILE* file = fopen(filename, "wb");
+    int success = 1;
     if (!file) {
         perror("Error opening file for writing");
         return -1;
     }
 
-    if (fwrite(&robotCount, sizeof(int), 1, file) != 1) goto write_error;
-    if (fwrite(robots, sizeof(Robot), robotCount, file) != robotCount) goto write_error;
+    if (fwrite(&robotCount, sizeof(int), 1, file) != 1) success = 0;
+    if (success && fwrite(robots, sizeof(Robot), robotCount, file) != robotCount) success = 0;
 
-    if (fwrite(&taskCount, sizeof(int), 1, file) != 1) goto write_error;
-    if (fwrite(tasks, sizeof(Task), taskCount, file) != taskCount) goto write_error;
+    if (success && fwrite(&taskCount, sizeof(int), 1, file) != 1) success = 0;
+    if (success && fwrite(tasks, sizeof(Task), taskCount, file) != taskCount) success = 0;
 
     int queueSize = assemblyQueue.size;
-    if (fwrite(&queueSize, sizeof(int), 1, file) != 1) goto write_error;
-    
+    if (success && fwrite(&queueSize, sizeof(int), 1, file) != 1) success = 0;
+
     QueueNode* current = assemblyQueue.front;
-    while (current != NULL) {
-        if (fwrite(&current->task, sizeof(Task), 1, file) != 1) goto write_error;
+    while (success && current != NULL) {
+        if (fwrite(&current->task, sizeof(Task), 1, file) != 1) success = 0;
         current = current->next;
     }
 
     int stackSize = undoStack.size;
-    if (fwrite(&stackSize, sizeof(int), 1, file) != 1) goto write_error;
-    
+    if (success && fwrite(&stackSize, sizeof(int), 1, file) != 1) success = 0;
+
     StackNode* stackCurrent = undoStack.top;
-    while (stackCurrent != NULL) {
-        if (fwrite(&stackCurrent->task, sizeof(Task), 1, file) != 1) goto write_error;
+    while (success && stackCurrent != NULL) {
+        if (fwrite(&stackCurrent->task, sizeof(Task), 1, file) != 1) success = 0;
         stackCurrent = stackCurrent->next;
     }
 
     fclose(file);
-    return 0;
 
-write_error:
-    perror("Error writing to file");
-    fclose(file);
-    return -1;
+    if (!success) {
+        perror("Error writing to file");
+        return -1;
+    }
+    return 0;
 }
 
 int loadSession(const char* filename) {
     FILE* file = fopen(filename, "rb");
+    int success = 1;
     if (!file) {
         perror("Error opening file for reading");
         return -1;
@@ -132,32 +134,34 @@ int loadSession(const char* filename) {
     robotCount = 0;
     taskCount = 0;
 
-    if (fread(&robotCount, sizeof(int), 1, file) != 1) goto read_error;
-    if (fread(robots, sizeof(Robot), robotCount, file) != robotCount) goto read_error;
-    if (fread(&taskCount, sizeof(int), 1, file) != 1) goto read_error;
-    if (fread(tasks, sizeof(Task), taskCount, file) != taskCount) goto read_error;
-    int queueSize;
-    if (fread(&queueSize, sizeof(int), 1, file) != 1) goto read_error;
-    
-    for (int i = 0; i < queueSize; i++) {
+    if (fread(&robotCount, sizeof(int), 1, file) != 1) success = 0;
+    if (success && fread(robots, sizeof(Robot), robotCount, file) != robotCount) success = 0;
+    if (success && fread(&taskCount, sizeof(int), 1, file) != 1) success = 0;
+    if (success && fread(tasks, sizeof(Task), taskCount, file) != taskCount) success = 0;
+
+    int queueSize = 0;
+    if (success && fread(&queueSize, sizeof(int), 1, file) != 1) success = 0;
+
+    for (int i = 0; success && i < queueSize; i++) {
         Task task;
-        if (fread(&task, sizeof(Task), 1, file) != 1) goto read_error;
-        enqueue(task);
+        if (fread(&task, sizeof(Task), 1, file) != 1) success = 0;
+        else enqueue(task);
     }
-    int stackSize;
-    if (fread(&stackSize, sizeof(int), 1, file) != 1) goto read_error;
-    
-    for (int i = 0; i < stackSize; i++) {
+
+    int stackSize = 0;
+    if (success && fread(&stackSize, sizeof(int), 1, file) != 1) success = 0;
+
+    for (int i = 0; success && i < stackSize; i++) {
         Task task;
-        if (fread(&task, sizeof(Task), 1, file) != 1) goto read_error;
-        pushUndo(task);
+        if (fread(&task, sizeof(Task), 1, file) != 1) success = 0;
+        else pushUndo(task);
     }
 
     fclose(file);
+
+    if (!success) {
+        perror("Error reading from file");
+        return -1;
+    }
     return 0;
-
-read_error:
-    perror("Error reading from file");
-    fclose(file);
-    return -1;
 }

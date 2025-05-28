@@ -1,24 +1,32 @@
 #include "tree.h"
+#include "robot.h"
+#include "task.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 TreeNode* createFactoryTree(void) {
-    TreeNode* factory = createNode("Factory");
-    TreeNode* rawMaterials = createNode("Raw Materials Zone");
-    TreeNode* assembly = createNode("Assembly Zone");
-    TreeNode* qualityControl = createNode("Quality Control");
-    TreeNode* dispatch = createNode("Dispatch Section");
-    TreeNode* robotArmA = createNode("Robot Arm A");
-    TreeNode* robotArmB = createNode("Robot Arm B");
-    addChild(assembly, robotArmA);
-    addChild(assembly, robotArmB);
-    addChild(factory, rawMaterials);
-    addChild(factory, assembly);
-    addChild(factory, qualityControl);
-    addChild(factory, dispatch);
-    return factory;
+    TreeNode* root = createNode("Factory");
+
+    TreeNode* taskZone = createNode("Task Zone");
+    TreeNode* robotZone = createNode("Robot Zone");
+    TreeNode* statusCheck = createNode("Status Check");
+    TreeNode* completedZone = createNode("Completed Zone");
+
+    TreeNode* robot1 = createNode("Robot 1");
+    TreeNode* robot2 = createNode("Robot 2");
+
+    addChild(robotZone, robot1);
+    addChild(robotZone, robot2);
+
+    addChild(root, taskZone);
+    addChild(root, robotZone);
+    addChild(root, statusCheck);
+    addChild(root, completedZone);
+
+    return root;
 }
+
 
 TreeNode* createNode(const char* name) {
     TreeNode* node = malloc(sizeof(TreeNode));

@@ -60,18 +60,16 @@ void managerobotssubmenu(void) {
                 break;
             }
             case 4: {
-                int id;
-                int found=0;
-                printf("Enter Robot ID to view: ");
-                scanf("%d", &id);
-                for(int i=0;i<MAX_ROBOTS;i++){
-                    if(robots[i].id==i){
-                        Robot *robot = viewRobotById(id);
-                     if (robot) printRobotDetails(robot);
-                     found=1;
-                    }
-                }     if(!found) printf("Robot not found.");
-                break;
+                     int id;
+                     printf("Enter Robot ID to view: ");
+                     scanf("%d", &id);
+                     Robot *robot = viewRobotById(id);
+                        if (robot != NULL) {
+                             printRobotDetails(robot);
+                         } else {
+                             printf("Robot not found.\n");
+                         }
+                     break;
             }
             case 5:
                 listAllRobots();
